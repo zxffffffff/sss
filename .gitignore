@@ -50,3 +50,19 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# IDE build
+vcpkg_installed
+build/*
+build-*/*
+install/*
+install-*/*
+.vs
+out/*
+.vscode
+enc_temp_folder
+.DS_Store
+Testing
+vcpkg
+.idea
+.venv
