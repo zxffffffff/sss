@@ -8,6 +8,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wstrict-prototypes -Wmissing-prototypes")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_FORTIFY_SOURCE=2 -fPIC -fno-strict-overflow")
 
 set(SRCS hazmat.c randombytes.c sss.c tweetnacl.c)
+set(INCS hazmat.h randombytes.h sss.h tweetnacl.h)
 
 add_library(sss STATIC ${SRCS})
 
@@ -26,7 +27,14 @@ add_custom_target(check
     DEPENDS test_hazmat test_sss
 )
 
-add_custom_target(clean-all
-    COMMAND ${CMAKE_MAKE_PROGRAM} clean
-    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target clean
+set_target_properties(sss
+    PROPERTIES
+    PUBLIC_HEADER "${INCS}"
+)
+
+install(TARGETS sss
+    PUBLIC_HEADER DESTINATION include
+    RUNTIME DESTINATION bin # .dll
+    LIBRARY DESTINATION bin # .dylib .so
+    ARCHIVE DESTINATION lib # .lib .a
 )
