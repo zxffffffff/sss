@@ -13,6 +13,7 @@
  */
 
 
+#include "platform.h"
 #include "randombytes.h"
 #include "tweetnacl.h"
 #include "sss.h"
@@ -82,10 +83,10 @@ void sss_create_shares(sss_Share *out, const unsigned char *data,
 	unsigned char key[32];
 	unsigned char m[crypto_secretbox_ZEROBYTES + sss_MLEN] = { 0 };
 	unsigned long long mlen = sizeof(m); /* length includes zero-bytes */
-	unsigned char c[mlen];
 	int tmp;
-	sss_Keyshare keyshares[n];
 	size_t idx;
+	NEW_ARRAY(unsigned char, c, mlen);
+	NEW_ARRAY(sss_Keyshare, keyshares, n);
 
 	/* Generate a random encryption key */
 	randombytes(key, sizeof(key));
@@ -105,6 +106,9 @@ void sss_create_shares(sss_Share *out, const unsigned char *data,
 		memcpy(get_ciphertext((sss_Share*) &out[idx]),
 		       &c[crypto_secretbox_BOXZEROBYTES], sss_CLEN);
 	}
+
+	DELETE_ARRAY(c);
+	DELETE_ARRAY(keyshares);
 }
 
 
@@ -120,10 +124,10 @@ int sss_combine_shares(uint8_t *data, const sss_Share *shares, uint8_t k)
 	unsigned char key[crypto_secretbox_KEYBYTES];
 	unsigned char c[crypto_secretbox_BOXZEROBYTES + sss_CLEN] = { 0 };
 	unsigned long long clen = sizeof(c);
-	unsigned char m[clen];
-	sss_Keyshare keyshares[k];
 	size_t idx;
 	int ret = 0;
+	NEW_ARRAY(unsigned char, m, clen);
+	NEW_ARRAY(sss_Keyshare, keyshares, k);
 
 	/* Check if all ciphertexts are the same */
 	if (k < 1) return -1;
@@ -146,6 +150,9 @@ int sss_combine_shares(uint8_t *data, const sss_Share *shares, uint8_t k)
 	       &shares[0][sss_KEYSHARE_LEN], sss_CLEN);
 	ret |= crypto_secretbox_open(m, c, clen, nonce, key);
 	memcpy(data, &m[crypto_secretbox_ZEROBYTES], sss_MLEN);
+
+	DELETE_ARRAY(m);
+	DELETE_ARRAY(keyshares);
 
 	return ret;
 }
