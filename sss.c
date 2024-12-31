@@ -13,7 +13,7 @@
  */
 
 
-#include "platform.h"
+#include "c_def.h"
 #include "randombytes.h"
 #include "tweetnacl.h"
 #include "sss.h"

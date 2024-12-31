@@ -18,7 +18,7 @@
  */
 
 
-#include "platform.h"
+#include "c_def.h"
 #include "randombytes.h"
 #include "hazmat.h"
 #include <assert.h>
@@ -291,7 +291,7 @@ gf256_inv(uint32_t r[8], uint32_t x[8])
 	bitslice(poly0, key);
 
 	/* Generate the other terms of the polynomial */
-	randombytes((void*) poly, sizeof(poly));
+	randombytes(&poly[0][0], sizeof(uint32_t) * (k - 1) * 8);
 
 	for (share_idx = 0; share_idx < n; share_idx++) {
 		/* x value is in 1..n */
@@ -312,7 +312,7 @@ gf256_inv(uint32_t r[8], uint32_t x[8])
 		unbitslice(&out[share_idx][1], y);
 	}
 
-	DELETE_ARRAY_2D(poly, k - 1);
+	DELETE_ARRAY_2D(poly);
 }
 
 
@@ -356,6 +356,6 @@ gf256_inv(uint32_t r[8], uint32_t x[8])
 	}
 	unbitslice(key, secret);
 
-	DELETE_ARRAY_2D(xs, k);
-	DELETE_ARRAY_2D(ys, k);
+	DELETE_ARRAY_2D(xs);
+	DELETE_ARRAY_2D(ys);
 }
